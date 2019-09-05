@@ -1,6 +1,7 @@
 package com.room.booking.controller;
 
 import com.room.booking.exception.ApiErrorResponse;
+import com.room.booking.exception.EntityNotExistsException;
 import com.room.booking.exception.RoomAlreadyBooked;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,20 @@ public class GlobalExceptionHandlerController extends ResponseEntityExceptionHan
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(RoomAlreadyBooked.class)
-    public ResponseEntity<ApiErrorResponse> handleAuthorIsUsedException(Exception ex, WebRequest request) {
+    public ResponseEntity<ApiErrorResponse> roomAlreadyBooked(Exception ex, WebRequest request) {
+
+        return prepareResponse(
+                new ApiErrorResponse.ApiErrorResponseBuilder()
+                        .withStatus(HttpStatus.BAD_REQUEST)
+                        .withError_code(HttpStatus.BAD_REQUEST.toString())
+                        .withMessage(ex.getMessage())
+                        .withDetail(request.getDescription(false)).build());
+
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EntityNotExistsException.class)
+    public ResponseEntity<ApiErrorResponse> entityNotExists(Exception ex, WebRequest request) {
 
         return prepareResponse(
                 new ApiErrorResponse.ApiErrorResponseBuilder()

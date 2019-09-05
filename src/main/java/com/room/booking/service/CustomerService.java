@@ -13,11 +13,11 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
 
-    public Optional<Customer> getCustomerByEmail(String customerEmail) {
+    Optional<Customer> getCustomerByEmail(String customerEmail) {
         return customerRepository.findByEmailAddress(customerEmail);
     }
 
-    public Customer getCustomer(Customer customer) {
+    Customer getCustomer(Customer customer) {
         final Optional<Customer> customerByEmail = getCustomerByEmail(customer.getEmailAddress());
         return customerByEmail.orElseGet(() -> customerRepository.save(customer));
     }

@@ -1,6 +1,5 @@
 package com.room.booking.service;
 
-import com.room.booking.entity.BookingDTO;
 import com.room.booking.entity.Room;
 import com.room.booking.exception.RoomAlreadyBooked;
 import com.room.booking.repository.RoomRepository;

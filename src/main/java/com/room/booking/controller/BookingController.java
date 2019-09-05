@@ -40,9 +40,10 @@ public class BookingController {
         return new ResponseEntity<>(booking, HttpStatus.OK);
     }
 
-//    @PostMapping("/{bookingId}/cancel")
-//    public ResponseEntity<?> cancelBooking(@PathVariable String bookingId) {
-//
-//    }
+    @PostMapping("/{bookingId}/cancel")
+    public ResponseEntity<?> cancelBooking(@PathVariable Long bookingId, @RequestBody BookingDTO bookingDTO) {
+        bookingService.cancelBooking(bookingId, bookingDTO);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
 }
