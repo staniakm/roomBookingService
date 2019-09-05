@@ -1,7 +1,9 @@
 package com.room.booking.controller;
 
+import com.room.booking.entity.Booking;
 import com.room.booking.entity.BookingDTO;
 import com.room.booking.entity.Room;
+import com.room.booking.service.BookingService;
 import com.room.booking.service.RoomService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,6 +20,7 @@ import java.util.List;
 public class BookingController {
 
     private final RoomService roomService;
+    private final BookingService bookingService;
 
     @GetMapping("/rooms")
     public ResponseEntity<List<Room>> getAvailableRooms(
@@ -28,13 +31,18 @@ public class BookingController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                     LocalDate dateTo
     ) {
-        return new ResponseEntity<>(roomService.findAvailableRooms(dateFrom, dateTo), HttpStatus.OK);
+        return new ResponseEntity<>(bookingService.findAvailableRooms(dateFrom, dateTo), HttpStatus.OK);
     }
 
     @PostMapping("/{roomId}/book")
-    public ResponseEntity<Room> bookRoom(@PathVariable("roomId") Long roomId, @RequestBody BookingDTO bookingDTO) {
-        final Room room = roomService.bookRoom(roomId, bookingDTO);
-        return new ResponseEntity<>(room, HttpStatus.OK);
+    public ResponseEntity<Booking> bookRoom(@PathVariable("roomId") Long roomId, @RequestBody BookingDTO bookingDTO) {
+        final Booking booking = bookingService.bookRoom(roomId, bookingDTO);
+        return new ResponseEntity<>(booking, HttpStatus.OK);
     }
+
+//    @PostMapping("/{bookingId}/cancel")
+//    public ResponseEntity<?> cancelBooking(@PathVariable String bookingId) {
+//
+//    }
 
 }

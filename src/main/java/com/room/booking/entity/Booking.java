@@ -1,5 +1,6 @@
 package com.room.booking.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,11 +10,12 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
-public class Book {
+@Builder
+public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookId;
+    private Long bookingId;
 
     @OneToOne
     @JoinColumn(name = "ROOM_ID")
