@@ -68,4 +68,12 @@ public class BookingService {
         } else
             throw new IllegalArgumentException("Can't cancel others booking.");
     }
+
+    List<Booking> findAllUnconfirmed() {
+        return bookingRepository.findAllByBookingByStatus(Status.CREATED);
+    }
+
+    List<Booking> findAllUpcomingBookings() {
+        return bookingRepository.findAllUpcomingBookings(LocalDate.now().plusDays(1));
+    }
 }
