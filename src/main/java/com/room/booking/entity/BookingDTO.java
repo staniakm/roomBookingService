@@ -1,6 +1,5 @@
 package com.room.booking.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 

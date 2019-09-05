@@ -21,4 +21,6 @@ public class Customer {
     private String surname;
     @NotEmpty
     private String emailAddress;
+    @NotEmpty
+    private String phoneNumber;
 }
