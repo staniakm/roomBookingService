@@ -19,7 +19,6 @@ import java.util.List;
 @AllArgsConstructor
 public class BookingController {
 
-    private final RoomService roomService;
     private final BookingService bookingService;
 
     @GetMapping("/rooms")
