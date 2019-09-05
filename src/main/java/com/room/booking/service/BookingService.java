@@ -46,7 +46,7 @@ public class BookingService {
 
     }
 
-    public void cancelBooking(Long bookingId, BookingDTO bookingDTO) {
+    public Booking cancelBooking(Long bookingId, BookingDTO bookingDTO) {
         final Optional<Booking> bookingById = bookingRepository.findById(bookingId);
         if (!bookingById.isPresent()) {
             log.info("Booking {} doesnt exists", bookingId);
@@ -63,8 +63,9 @@ public class BookingService {
         Customer customer = customerByEmail.get();
         if (booking.getCustomer().equals(customer)) {
             booking.setBookingStatus(Status.CANCELLED);
-            bookingRepository.save(booking);
+            final Booking canceled = bookingRepository.save(booking);
             log.info("Booking {} canceled for customer {}", booking.getBookingId(), customer.getCustomerId());
+            return canceled;
         } else
             throw new IllegalArgumentException("Can't cancel others booking.");
     }
