@@ -21,7 +21,7 @@ public class BookingService {
 
     private final RoomService roomService;
     private final CustomerService customerService;
-    private BookingRepository bookingRepository;
+    private final BookingRepository bookingRepository;
 
     public List<Room> findAvailableRooms(LocalDate dateFrom, LocalDate dateTo) {
         return roomService.findAvailableRooms(dateFrom, dateTo);
