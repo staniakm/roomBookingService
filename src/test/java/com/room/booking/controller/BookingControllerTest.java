@@ -37,7 +37,7 @@ public class BookingControllerTest {
     @Test
     public void shouldFetchBookings() throws Exception {
         mvc.perform(MockMvcRequestBuilders
-                .get("/booking/rooms?start=2019-02-02&end=2019-02-10")
+                .get("/bookings/rooms?start=2019-02-02&end=2019-02-10")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
@@ -54,7 +54,7 @@ public class BookingControllerTest {
                 "\"dateFrom\":\"2019-12-29\"," +
                 "\"dateTo\":\"2019-12-30\"" +
                 "}";
-        mvc.perform(post("/booking/1/book")
+        mvc.perform(post("/bookings/1/book")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(json))
                 .andExpect(status().isCreated())
@@ -75,7 +75,7 @@ public class BookingControllerTest {
 
         assertEquals(status, "CREATED");
 
-        mvc.perform(post("/booking/3/cancel")
+        mvc.perform(post("/bookings/3/cancel")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(requestJson))
                 .andExpect(status().isOk())

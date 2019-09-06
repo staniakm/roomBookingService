@@ -23,7 +23,7 @@ public class GlobalExceptionHandlerController extends ResponseEntityExceptionHan
         return prepareResponse(
                 new ApiErrorResponse.ApiErrorResponseBuilder()
                         .withStatus(HttpStatus.BAD_REQUEST)
-                        .withError_code(HttpStatus.BAD_REQUEST.toString())
+                        .withErrorCode(HttpStatus.BAD_REQUEST.toString())
                         .withMessage(ex.getMessage())
                         .withDetail(request.getDescription(false)).build());
 
@@ -36,7 +36,7 @@ public class GlobalExceptionHandlerController extends ResponseEntityExceptionHan
         return prepareResponse(
                 new ApiErrorResponse.ApiErrorResponseBuilder()
                         .withStatus(HttpStatus.BAD_REQUEST)
-                        .withError_code(HttpStatus.BAD_REQUEST.toString())
+                        .withErrorCode(HttpStatus.BAD_REQUEST.toString())
                         .withMessage(ex.getMessage())
                         .withDetail(request.getDescription(false)).build());
 

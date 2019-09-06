@@ -12,6 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -29,10 +31,13 @@ public class BookingService {
         log.info("Start creating booking for room {}", roomId);
         final LocalDate dateFrom = bookingDTO.getDateFrom();
         final LocalDate dateTo = bookingDTO.getDateTo();
+        if (isNull(dateFrom) || isNull(dateTo)) {
+            throw new IllegalArgumentException("Both starting date and ending date should be provided");
+        }
         Room room = roomService.getRoomIfAvailable(roomId, dateFrom, dateTo);
 
         Customer mappedCustomer = CustomerMapper.toEntity(bookingDTO);
-        Customer customer = customerService.getCustomer(mappedCustomer);
+        Customer customer = customerService.getExistingCustomerOrCreateNew(mappedCustomer);
 
         final Booking booking = Booking.builder()
                 .bookingStatus(Status.CREATED)
@@ -50,7 +55,7 @@ public class BookingService {
         final Optional<Booking> bookingById = bookingRepository.findById(bookingId);
         if (!bookingById.isPresent()) {
             log.info("Booking {} doesnt exists", bookingId);
-            throw new EntityNotExistsException("Booking doesnt exists");
+            throw new EntityNotExistsException("Booking doesn't exists");
 
         }
         Booking booking = bookingById.get();
@@ -63,9 +68,9 @@ public class BookingService {
         Customer customer = customerByEmail.get();
         if (booking.getCustomer().equals(customer)) {
             booking.setBookingStatus(Status.CANCELLED);
-            final Booking canceled = bookingRepository.save(booking);
-            log.info("Booking {} canceled for customer {}", booking.getBookingId(), customer.getCustomerId());
-            return canceled;
+            final Booking cancelled = bookingRepository.save(booking);
+            log.info("Booking {} cancelled for customer {}", booking.getBookingId(), customer.getCustomerId());
+            return cancelled;
         } else
             throw new IllegalArgumentException("Can't cancel others booking.");
     }

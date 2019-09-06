@@ -17,7 +17,7 @@ public class CustomerService {
         return customerRepository.findByEmailAddress(customerEmail);
     }
 
-    Customer getCustomer(Customer customer) {
+    Customer getExistingCustomerOrCreateNew(Customer customer) {
         final Optional<Customer> customerByEmail = getCustomerByEmail(customer.getEmailAddress());
         return customerByEmail.orElseGet(() -> customerRepository.save(customer));
     }
