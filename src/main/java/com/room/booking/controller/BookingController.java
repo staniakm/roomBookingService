@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/booking")
+@RequestMapping("/bookings")
 @AllArgsConstructor
 public class BookingController {
 
@@ -23,13 +24,16 @@ public class BookingController {
 
     @GetMapping(value = "/rooms", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Room>> getAvailableRooms(
-            @RequestParam(value = "start")
+            @RequestParam(value = "start", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate dateFrom,
-            @RequestParam(value = "end")
+                    Optional<LocalDate> optionalDateFrom,
+            @RequestParam(value = "end", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                    LocalDate dateTo
+                    Optional<LocalDate> optionalDateTo
     ) {
+
+        LocalDate dateFrom = optionalDateFrom.orElseGet(LocalDate::now);
+        LocalDate dateTo = optionalDateTo.orElseGet(() -> dateFrom.plusDays(2));
         return new ResponseEntity<>(bookingService.findAvailableRooms(dateFrom, dateTo), HttpStatus.OK);
     }
 
@@ -41,8 +45,8 @@ public class BookingController {
 
     @PostMapping("/{bookingId}/cancel")
     public ResponseEntity<Booking> cancelBooking(@PathVariable Long bookingId, @RequestBody BookingDTO bookingDTO) {
-        Booking canceledBooking = bookingService.cancelBooking(bookingId, bookingDTO);
-        return new ResponseEntity<>(canceledBooking, HttpStatus.OK);
+        Booking cancelledBooking = bookingService.cancelBooking(bookingId, bookingDTO);
+        return new ResponseEntity<>(cancelledBooking, HttpStatus.OK);
     }
 
 }

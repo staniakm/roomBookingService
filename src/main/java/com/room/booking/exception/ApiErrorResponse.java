@@ -1,22 +1,25 @@
 package com.room.booking.exception;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 import java.util.Date;
 
 @Getter
+@JsonInclude(Include.NON_NULL)
 public class ApiErrorResponse {
     private Date timestamp;
     private HttpStatus status;
-    private String error_code;
+    private String errorCode;
     private String message;
     private String detail;
 
     //Builder
     public static final class ApiErrorResponseBuilder {
         private HttpStatus status;
-        private String error_code;
+        private String errorCode;
         private String message;
         private String detail;
 
@@ -28,8 +31,8 @@ public class ApiErrorResponse {
             return this;
         }
 
-        public ApiErrorResponseBuilder withError_code(String error_code) {
-            this.error_code = error_code;
+        public ApiErrorResponseBuilder withErrorCode(String errorCode) {
+            this.errorCode = errorCode;
             return this;
         }
 
@@ -47,7 +50,7 @@ public class ApiErrorResponse {
             ApiErrorResponse apiErrorResponse = new ApiErrorResponse();
             apiErrorResponse.timestamp = new Date();
             apiErrorResponse.status = this.status;
-            apiErrorResponse.error_code = this.error_code;
+            apiErrorResponse.errorCode = this.errorCode;
             apiErrorResponse.detail = this.detail;
             apiErrorResponse.message = this.message;
 
