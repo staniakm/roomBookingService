@@ -1,7 +1,7 @@
 package com.room.booking.service;
 
 import com.room.booking.entity.Room;
-import com.room.booking.exception.RoomAlreadyBooked;
+import com.room.booking.exception.RoomAlreadyBookedException;
 import com.room.booking.repository.RoomRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ public class RoomService {
             return optionalRoom.get();
         }
         log.info("Room {} is not available", roomId);
-        throw new RoomAlreadyBooked(String.format("Selected room is not available for date range %s and %s", dateFrom, dateTo));
+        throw new RoomAlreadyBookedException(String.format("Selected room is not available for date range %s and %s", dateFrom, dateTo));
     }
 
     List<Room> findAvailableRooms(LocalDate dateFrom, LocalDate dateTo) {

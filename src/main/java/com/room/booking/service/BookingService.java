@@ -2,6 +2,7 @@ package com.room.booking.service;
 
 import com.room.booking.entity.*;
 import com.room.booking.entity.mapper.CustomerMapper;
+import com.room.booking.exception.CancelOtherCustomerBookingException;
 import com.room.booking.exception.EntityNotExistsException;
 import com.room.booking.repository.BookingRepository;
 import lombok.AllArgsConstructor;
@@ -40,7 +41,7 @@ public class BookingService {
         Customer customer = customerService.getExistingCustomerOrCreateNew(mappedCustomer);
 
         final Booking booking = Booking.builder()
-                .bookingStatus(Status.CREATED)
+                .bookingStatus(BookingStatus.CREATED)
                 .customer(customer)
                 .room(room)
                 .dateFrom(dateFrom)
@@ -54,7 +55,7 @@ public class BookingService {
     public Booking cancelBooking(Long bookingId, BookingDTO bookingDTO) {
         final Optional<Booking> bookingById = bookingRepository.findById(bookingId);
         if (!bookingById.isPresent()) {
-            log.info("Booking {} doesnt exists", bookingId);
+            log.warn("Booking {} doesnt exists", bookingId);
             throw new EntityNotExistsException("Booking doesn't exists");
 
         }
@@ -62,21 +63,21 @@ public class BookingService {
 
         final Optional<Customer> customerByEmail = customerService.getCustomerByEmail(bookingDTO.getCustomerEmail());
         if (!customerByEmail.isPresent()) {
-            log.info("Customer with email {} doesn't exists", bookingDTO.getCustomerEmail());
+            log.warn("Customer with email {} doesn't exists", bookingDTO.getCustomerEmail());
             throw new EntityNotExistsException("Customer doesn't exists");
         }
         Customer customer = customerByEmail.get();
         if (booking.getCustomer().equals(customer)) {
-            booking.setBookingStatus(Status.CANCELLED);
+            booking.setBookingStatus(BookingStatus.CANCELLED);
             final Booking cancelled = bookingRepository.save(booking);
             log.info("Booking {} cancelled for customer {}", booking.getBookingId(), customer.getCustomerId());
             return cancelled;
         } else
-            throw new IllegalArgumentException("Can't cancel others booking.");
+            throw new CancelOtherCustomerBookingException("Can't cancel others booking");
     }
 
     List<Booking> findAllUnconfirmed() {
-        return bookingRepository.findAllByBookingByStatus(Status.CREATED);
+        return bookingRepository.findAllByBookingByStatus(BookingStatus.CREATED);
     }
 
     List<Booking> findAllUpcomingBookings() {

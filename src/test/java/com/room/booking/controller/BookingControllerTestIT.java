@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource(
         locations = "classpath:application-integrationtest.properties")
-public class BookingControllerTest {
+public class BookingControllerTestIT {
     @Autowired
     private MockMvc mvc;
 
@@ -35,7 +36,7 @@ public class BookingControllerTest {
     private BookingRepository repository;
 
     @Test
-    public void shouldFetchBookings() throws Exception {
+    public void shouldFetchBookingsAvailableRoomsBetweenDateRange() throws Exception {
         mvc.perform(MockMvcRequestBuilders
                 .get("/bookings/rooms?start=2019-02-02&end=2019-02-10")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -46,7 +47,7 @@ public class BookingControllerTest {
     }
 
     @Test
-    public void shouldAllowToBookingRoom() throws Exception {
+    public void shouldAllowToBookingAvailableRoom() throws Exception {
         final String json = "{" +
                 "\"customerName\":\"jas\"," +
                 "\"customerSurname\":\"kowalski\"," +
@@ -64,8 +65,24 @@ public class BookingControllerTest {
     }
 
     @Test
+    public void shouldNotAllowToBookingUnavailableRoom() throws Exception {
+        final String json = "{" +
+                "\"customerName\":\"jas\"," +
+                "\"customerSurname\":\"kowalski\"," +
+                "\"customerEmail\":\"jas.kowlaski@gmail.com\"," +
+                "\"dateFrom\":\"2019-01-01\"," +
+                "\"dateTo\":\"2019-02-01\"" +
+                "}";
+        mvc.perform(post("/bookings/1/book")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message", Matchers.is("Selected room is not available for date range 2019-01-01 and 2019-02-01")));
+    }
+
+    @Test
     public void shouldAllowToCancelBooking() throws Exception {
-        final String status = repository.findById(3L).map(b -> b.getBookingStatus().toString()).orElse("");
+        final String actualStatus = repository.findById(3L).map(b -> b.getBookingStatus().toString()).orElse("");
 
         final String requestJson = "{" +
                 "\"customerName\":\"jaś\"," +
@@ -73,7 +90,7 @@ public class BookingControllerTest {
                 "\"customerEmail\":\"test2@test.pl\"" +
                 "}";
 
-        assertEquals(status, "CREATED");
+        assertEquals("CREATED", actualStatus);
 
         mvc.perform(post("/bookings/3/cancel")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -82,5 +99,53 @@ public class BookingControllerTest {
                 .andExpect(jsonPath("bookingId", Matchers.is(3)))
                 .andExpect(jsonPath("room.roomId", Matchers.is(2)))
                 .andExpect(jsonPath("bookingStatus", Matchers.is("CANCELLED")));
+    }
+
+    @Test
+    public void shouldNotAllowToCancelNotExistingBooking() throws Exception {
+        final String requestJson = "{" +
+                "\"customerName\":\"jaś\"," +
+                "\"customerSurname\":\"kowalski\"," +
+                "\"customerEmail\":\"test2@test.pl\"" +
+                "}";
+
+        mvc.perform(post("/bookings/999/cancel")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message", Matchers.is("Booking doesn't exists")));
+    }
+
+
+    @Test
+    public void shouldNotAllowToCancelOtherCustomerBooking() throws Exception {
+        final String requestJson = "{" +
+                "\"customerName\":\"jaś\"," +
+                "\"customerSurname\":\"kowalski\"," +
+                "\"customerEmail\":\"test2@test.pl\"" +
+                "}";
+
+        mvc.perform(post("/bookings/1/cancel")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestJson))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message", Matchers.is("Can't cancel others booking")));
+    }
+
+
+    @Test
+    public void shouldNotAllowToBookingBookingRoomWithoutEmail() throws Exception {
+        final String json = "{" +
+                "\"customerName\":\"jas\"," +
+                "\"customerSurname\":\"kowalski\"," +
+                "\"dateFrom\":\"2019-12-29\"," +
+                "\"dateTo\":\"2019-12-30\"" +
+                "}";
+        mvc.perform(post("/bookings/1/book")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("message", Matchers.is("emailAddress - must not be blank")));
     }
 }

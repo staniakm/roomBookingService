@@ -1,5 +1,5 @@
 package com.room.booking.entity;
 
-public enum Status {
+public enum BookingStatus {
     CREATED, CONFIRMED, CANCELLED
 }
