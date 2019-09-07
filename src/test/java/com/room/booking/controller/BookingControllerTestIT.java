@@ -135,12 +135,12 @@ public class BookingControllerTestIT {
 
 
     @Test
-    public void shouldNotAllowToBookingBookingRoomWithoutEmail() throws Exception {
+    public void shouldNotAllowToBookingRoomWithoutCustomerEmail() throws Exception {
         final String json = "{" +
                 "\"customerName\":\"jas\"," +
                 "\"customerSurname\":\"kowalski\"," +
-                "\"dateFrom\":\"2019-12-29\"," +
-                "\"dateTo\":\"2019-12-30\"" +
+                "\"dateFrom\":\"2019-10-29\"," +
+                "\"dateTo\":\"2019-10-30\"" +
                 "}";
         mvc.perform(post("/bookings/1/book")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
