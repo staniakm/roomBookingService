@@ -1,8 +1,9 @@
 package com.room.booking.controller;
 
 import com.room.booking.exception.ApiErrorResponse;
+import com.room.booking.exception.CancelOtherCustomerBookingException;
 import com.room.booking.exception.EntityNotExistsException;
-import com.room.booking.exception.RoomAlreadyBooked;
+import com.room.booking.exception.RoomAlreadyBookedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,12 +14,14 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandlerController extends ResponseEntityExceptionHandler {
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(RoomAlreadyBooked.class)
-    public ResponseEntity<ApiErrorResponse> roomAlreadyBooked(Exception ex, WebRequest request) {
+    @ExceptionHandler({EntityNotExistsException.class, CancelOtherCustomerBookingException.class, RoomAlreadyBookedException.class})
+    public ResponseEntity<ApiErrorResponse> entityNotExists(Exception ex, WebRequest request) {
 
         return prepareResponse(
                 new ApiErrorResponse.ApiErrorResponseBuilder()
@@ -30,14 +33,16 @@ public class GlobalExceptionHandlerController extends ResponseEntityExceptionHan
     }
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(EntityNotExistsException.class)
-    public ResponseEntity<ApiErrorResponse> entityNotExists(Exception ex, WebRequest request) {
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<ApiErrorResponse> handleValidationException(ConstraintViolationException ex, WebRequest request) {
 
+        StringBuilder errorMessage = new StringBuilder();
+        ex.getConstraintViolations().forEach(exception -> errorMessage.append(exception.getPropertyPath()).append(" - ").append(exception.getMessage()));
         return prepareResponse(
                 new ApiErrorResponse.ApiErrorResponseBuilder()
                         .withStatus(HttpStatus.BAD_REQUEST)
                         .withErrorCode(HttpStatus.BAD_REQUEST.toString())
-                        .withMessage(ex.getMessage())
+                        .withMessage(errorMessage.toString())
                         .withDetail(request.getDescription(false)).build());
 
     }
